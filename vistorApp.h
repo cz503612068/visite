@@ -17,60 +17,62 @@
 
 HWINDOW g_hWindow;
 HWINDOW g_hMsgWindow;
-HWINDOW g_hLogoutWindow; //ç­¾ç¦»
-HWINDOW g_hExitWindow;   //é€€å‡º
-HWINDOW g_hOfficialWin; //æŸ¥è¯¢è¢«è®¿äººä¿¡æ¯ï¼Œè¯¦æƒ…
-HWINDOW g_hQueryDetail; //æŸ¥è¯¢è¯¦æƒ…
-HELE g_hCurSelTab;		//å½“å‰é€‰æ‹©çš„TAB
+HWINDOW g_hLogoutWindow; //Ç©Àë
+HWINDOW g_hExitWindow;   //ÍË³ö
+HWINDOW g_hOfficialWin; //²éÑ¯±»·ÃÈËĞÅÏ¢£¬ÏêÇé
+HWINDOW g_hQueryDetail; //²éÑ¯ÏêÇé
+HELE g_hCurSelTab;		//µ±Ç°Ñ¡ÔñµÄTAB
 IDCARD_ALL g_stIDCard;
 CNovelSocket *g_tSock;
 CAsyncSocket *g_UDPSock;
 CString sCONNSTR_MYSQL;
 CString sFolk[62];
 
-int g_nCaptureTick = 30;          //è®¾ç½®è§†å±è®¡æ—¶å™¨æ—¶é•¿ä¸º60s
-int g_nIDType;					//è¯ä»¶çš„ç§ç±»
-int g_nSqlConnectType;          //æ•°æ®åº“è¿æ¥æ–¹å¼
-bool g_bStopID2;				//åœæ­¢äºŒä»£è¯è¯»å†™å™¨çš„å¯»å¡
-bool g_bStopBarCode;			//åœæ­¢æ¡ç æ‰«æä¸ƒ
-bool g_bScanerISOK;				//æ‰«æä»ªæ˜¯å¦æ­£å¸¸
-char g_szHistVisitorName[50];   //å†å²æ¥è®¿åˆ—è¡¨è®¿å®¢å
-char g_szVisitorName[50];		//æ¥è®¿äººçš„å§“å
-char g_szOfficialIP[20];        //è¢«è®¿äººIP
+
+int g_nCaptureTick = 30;          //ÉèÖÃÊÓÆÁ¼ÆÊ±Æ÷Ê±³¤Îª60s
+int g_nIDType;					//Ö¤¼şµÄÖÖÀà
+int g_nSqlConnectType;          //Êı¾İ¿âÁ¬½Ó·½Ê½
+bool g_bStopID2;				//Í£Ö¹¶ş´úÖ¤¶ÁĞ´Æ÷µÄÑ°¿¨
+bool g_bStopBarCode;			//Í£Ö¹ÌõÂëÉ¨ÃèÆß
+bool g_bScanerISOK;				//É¨ÃèÒÇÊÇ·ñÕı³£
+char g_szHistVisitorName[50];   //ÀúÊ·À´·ÃÁĞ±í·Ã¿ÍÃû
+char g_szVisitorName[50];		//À´·ÃÈËµÄĞÕÃû
+char g_szOfficialIP[20];        //±»·ÃÈËIP
 static char g_szXmlInfo[1024];
-char g_szRecord[32];            //è§†é¢‘å‘é€è¯·æ±‚â€œæ¥è®¿ç¼–å·â€
-char g_szICCode[10];            //é—¨ç¦ICç‰©ç†å·
-char g_szStation[50];           //é—¨å«å
-char g_szOfficialID[20];        //è¢«è®¿äººID
+char g_szRecord[32];            //ÊÓÆµ·¢ËÍÇëÇó¡°À´·Ã±àºÅ¡±
+char g_szICCode[10];            //ÃÅ½ûICÎïÀíºÅ
+char g_szStation[50];           //ÃÅÎÀÃû
+char g_szOfficialID[20];        //±»·ÃÈËID
 bool g_bStartClipScreen;
-bool g_bShowCap;                //æ‘„åƒå¤´æ˜¯å¦æ˜¾ç¤º
-bool g_bCalled;                 //ä¿å­˜è®¿å®¢ä¿¡æ¯
-bool g_bFtpOpened;              //æ˜¯å¦æ‰“å¼€ftp
-bool g_bJob;                    //æ˜¯å¦ä¿å­˜æ—¥å¿—ä¿¡æ¯
-bool g_bICReg;                  //å¤§åéœ€æ±‚ICå¡è¯†åˆ«è¢«è®¿äºº
-bool g_bVisitorType;             //æ¥è®¿äººæ•° -> æ¥è®¿ç±»å‹
+bool g_bShowCap;                //ÉãÏñÍ·ÊÇ·ñÏÔÊ¾
+bool g_bCalled;                 //±£´æ·Ã¿ÍĞÅÏ¢
+bool g_bFtpOpened;              //ÊÇ·ñ´ò¿ªftp
+bool g_bJob;                    //ÊÇ·ñ±£´æÈÕÖ¾ĞÅÏ¢
+bool g_bICReg;                  //´ó»ªĞèÇóIC¿¨Ê¶±ğ±»·ÃÈË
+bool g_bVisitorType;             //À´·ÃÈËÊı -> À´·ÃÀàĞÍ
 
-bool g_bSSO;                    //å¤§åç‰¹æ®Šéœ€æ±‚SSO  
+bool g_bSSO;                    //´ó»ªÌØÊâĞèÇóSSO  
 
+bool g_bExpireData;              //Êı¾İ¹ıÆÚÇåÀí
 bool g_bFaceCompare;
 
-int g_nComboBoxCount;			//åˆ—è¡¨æ¡†çš„æ€»æ•°æ®è¡Œæ•°
-int g_nTableType;				//åˆ é™¤ç­‰æ“ä½œæ—¶çš„è¡¨ç±»å‹
-int g_nID2ReadType;				//äºŒä»£è¯çš„æ“ä½œæ–¹å¼(0ï¼šä¸æ˜¯äºŒä»£è¯ï¼›1ï¼šé˜…è¯»å™¨é˜…è¯»çš„äºŒä»£è¯ï¼›2ï¼šæ‰«æçš„äºŒä»£è¯)
-int g_nChaXunTongJiType;		//æŸ¥è¯¢ç»Ÿè®¡é¡µé¢çš„æ“ä½œç±»å‹
+int g_nComboBoxCount;			//ÁĞ±í¿òµÄ×ÜÊı¾İĞĞÊı
+int g_nTableType;				//É¾³ıµÈ²Ù×÷Ê±µÄ±íÀàĞÍ
+int g_nID2ReadType;				//¶ş´úÖ¤µÄ²Ù×÷·½Ê½(0£º²»ÊÇ¶ş´úÖ¤£»1£ºÔÄ¶ÁÆ÷ÔÄ¶ÁµÄ¶ş´úÖ¤£»2£ºÉ¨ÃèµÄ¶ş´úÖ¤)
+int g_nChaXunTongJiType;		//²éÑ¯Í³¼ÆÒ³ÃæµÄ²Ù×÷ÀàĞÍ
 
 POINT g_ptStart, g_ptEnd, g_ptPreEnd;
 RECT g_recDrawing;
 HDC g_compatibleHDC;
 bool g_bRectStart;
 
-HANDLE g_HWDThreadID2ID;   //äºŒä»£è¯çº¿ç¨‹
+HANDLE g_HWDThreadID2ID;   //¶ş´úÖ¤Ïß³Ì
 HANDLE g_HWDThreadTime;
 HANDLE g_ThreadSocketMutex;
-HANDLE g_ThreadReadBarcode; //æ¡ç ç­¾ç¦»çº¿ç¨‹
-HANDLE g_ThreadID2IC;   //äºŒä»£è¯ICå¡çº¿ç¨‹
-HANDLE g_hCom;  //å…¨å±€å˜é‡ï¼Œä¸²å£å¥æŸ„
-HINSTANCE  g_hDllJBC; //JBC7200é—¨ç¦æ¥å£åº“å¥æŸ„
+HANDLE g_ThreadReadBarcode; //ÌõÂëÇ©ÀëÏß³Ì
+HANDLE g_ThreadID2IC;   //¶ş´úÖ¤IC¿¨Ïß³Ì
+HANDLE g_hCom;  //È«¾Ö±äÁ¿£¬´®¿Ú¾ä±ú
+HINSTANCE  g_hDllJBC; //JBC7200ÃÅ½û½Ó¿Ú¿â¾ä±ú
 HBRUSH g_brush;
 HBITMAP g_hScreenBmp;
 extern HBITMAP CopyDCToBitmap(LPRECT lpRect, HDC hSrcDC);
@@ -80,18 +82,18 @@ char g_szLastID2[32];
 bool g_bPhoneIsBusy;
 bool g_bPhoneIsIni;
 bool g_bAcceptVisite;
-bool g_bSendVidoe;                  //å‘é€è§†é¢‘åˆ°ç¡®è®¤ç«¯
+bool g_bSendVidoe;                  //·¢ËÍÊÓÆµµ½È·ÈÏ¶Ë
 bool g_bPrintAfterAllow;
 bool g_bRequestThreadIsExist;
 bool g_bAutoCallOfficials;
 
-CInternetSession* m_pInetSession;	//ä¼šè¯å¯¹è±¡
-CFtpConnection* m_pFtpConnection;	//è¿æ¥å¯¹è±¡
-CFtpFileFind* m_pRemoteFinder;		//è¿œç¨‹æŸ¥æ‰¾æ–‡ä»¶å¯¹è±¡
-CFileFind m_LocalFinder;			//æœ¬åœ°æŸ¥æ‰¾æ–‡ä»¶å¯¹è±¡
+CInternetSession* m_pInetSession;	//»á»°¶ÔÏó
+CFtpConnection* m_pFtpConnection;	//Á¬½Ó¶ÔÏó
+CFtpFileFind* m_pRemoteFinder;		//Ô¶³Ì²éÕÒÎÄ¼ş¶ÔÏó
+CFileFind m_LocalFinder;			//±¾µØ²éÕÒÎÄ¼ş¶ÔÏó
 
 
-//èœå•çš„å…ƒç´ å¥æŸ„
+//²Ëµ¥µÄÔªËØ¾ä±ú
 HELE g_hTab1 = NULL;
 HELE g_hTab2 = NULL;
 HELE g_hTab3 = NULL;
@@ -122,7 +124,7 @@ HELE g_hTab38 = NULL;
 HELE g_hTab39 = NULL;
 //////////////////////////
 
-//é¡µé¢è§†å›¾çš„å…ƒç´ å¥æŸ„
+//Ò³ÃæÊÓÍ¼µÄÔªËØ¾ä±ú
 HELE g_hPage1 = NULL;
 HELE g_hPage2 = NULL;
 HELE g_hPage3 = NULL;
@@ -138,13 +140,13 @@ HELE g_hPage12 = NULL;
 //////////////////////////
 HELE htxtChaxunPwd= NULL;
 
-//éœ€è¦è®¾ç½®ä¸ºæ ‡é¢˜å­—ä½“çš„èµ„æºIDï¼Œç”±SetTitleFontè°ƒç”¨
+//ĞèÒªÉèÖÃÎª±êÌâ×ÖÌåµÄ×ÊÔ´ID£¬ÓÉSetTitleFontµ÷ÓÃ
 int g_nTitleFontID[128] = {IDG_VISTOR, IDG_PASSPORT, IDG_VIDEO, IDG_VISTORREG, IDG_MASTERINFO, IDS_DEVINFO, IDL_VISTORLIST, \
 						IDS_VISITORNAME, IDS_VISITORSEX, IDS_VISITORMOBILE, IDS_VISITORIDTYPE, IDS_VISITORIDNUM,\
 						IDS_VISITORADDRESS, IDS_VISITORREASON, IDS_VISITORTOTAL, IDS_VISITORUNIT, IDS_CARNUM,\
 						IDS_NAME, IDS_MASTERSEX, IDS_OFFICEPHONE, IDS_OFFICENAME, IDS_MOBILE, IDS_ZHIWU, IDS_OFFICENUM,\
 						IDS_VISITORFOLK, IDS_VISITORTHING, IDS_FZJG, IDS_VISITTIMES, IDS_ROOMNUM, IDS_SYSINFO};
-//éœ€è¦è®¾ç½®å­—ä½“çš„èµ„æºIDï¼Œç”±SetID2InfoFontè°ƒç”¨
+//ĞèÒªÉèÖÃ×ÖÌåµÄ×ÊÔ´ID£¬ÓÉSetID2InfoFontµ÷ÓÃ
 int g_nID2FontID[32] = {630, 631, 632, 633, 634, 635, 636, 637, 638, 639};
 extern void SetTitleFont();
 extern void SetID2InfoFont();
@@ -161,9 +163,9 @@ extern void InitIDTypeAndFolk();
 extern void ShowMainMenu(HELE hCurEle, BOOL bShow);
 ////////////////////////////////
 
-//////æ‘„åƒå¤´æ“ä½œ///////////////
+//////ÉãÏñÍ·²Ù×÷///////////////
 HWND g_hCapWnd;
-bool g_bVideoOpened;		//æ‘„åƒå¤´æ˜¯å¦å·²ç»æ‰“å¼€
+bool g_bVideoOpened;		//ÉãÏñÍ·ÊÇ·ñÒÑ¾­´ò¿ª
 extern BOOL VideoPreview();
 extern BOOL VideoPreview2();
 extern BOOL StopVideoPreview();
@@ -171,11 +173,11 @@ extern BOOL TakePhoto(wchar_t *pszFileName);
 extern BOOL TakePhoto2(wchar_t *pszFileName);
 ///////////////////////////////
 
-//è®¾ç½®æ¶ˆæ¯æ¡†(static)æ˜¾ç¤ºçš„æ¶ˆæ¯
+//ÉèÖÃÏûÏ¢¿ò(static)ÏÔÊ¾µÄÏûÏ¢
 extern void SetInfo(int nResID, wchar_t *pwsInfo);
 ///////////////////////////////
 
-//è®¾ç½®æ–‡æœ¬æ¡†è¾¹æ¡†é¢œè‰²
+//ÉèÖÃÎÄ±¾¿ò±ß¿òÑÕÉ«
 extern void SetMainDlgEditBorder();
 extern void SetOtherDlgEditBorder();
 extern void SetOfficialEditBorder();
@@ -195,38 +197,38 @@ DWORD WINAPI ReadICThread(LPVOID lpVoid);
 
 typedef struct tagVisitorInfo
 {
-	char szName[32];			//è®¿å®¢å§“å
-	char szSex[4];				//è®¿å®¢æ€§åˆ«
-	char szFolk[10];			//è®¿å®¢æ°‘æ—
-	char szPhone[16];			//è®¿å®¢ç”µè¯
-	char szIDType[32];			//è¯ä»¶ç±»å‹
-	char szID[30];				//è¯ä»¶å·ç 
-	char szSignDepartment[60];	//è®¿å®¢è¯ä»¶çš„ç­¾å‘æœºå…³
-	char szWithGoods[60];		//æºå¸¦çš„ç‰©å“
-	char szReason[40];			//æ¥è®¿åŸå› 
-	char szAddr[100];			//è®¿å®¢åœ°å€
-	char szTotalPeople[8];		//æ¥è®¿äººæ•°
-	char szUnit[100];			//è®¿å®¢å•ä½
-	char szJob[50];             //è®¿å®¢èŒä¸š   å¤§åéœ€æ±‚ 20160808 cc
-	char szCarNum[20];			//è®¿å®¢è½¦ç‰Œå·ç 
-	char szBarCode[32];			//è®¿é—®å•çš„æ¡ç 
-	char szToOfficialName[32];	//è¢«è®¿é—®äººå§“å
-	long lVisiteTime;			//æ¥è®¿æ—¶é—´
-	long lLeftTime;				//ç¦»å¼€æ—¶é—´
-	char szVisitStation[32];	//è®¿å®¢ç»ç”±é‚£ä¸ªé—¨å²—è¿›å…¥
-	char szUserVideoPic[256];	//è®¿å®¢è§†é¢‘ç…§ç‰‡çš„å­˜æ”¾åœ°å€
-	char szUserIDPic[256];		//è®¿å®¢è¯ä»¶ç…§ç‰‡çš„å­˜æ”¾åœ°å€
-	char szUserHeadPic[256];	//è®¿å®¢å¤´éƒ¨ç…§ç‰‡çš„å­˜æ”¾åœ°å€
-	char szUserIDFullPic[256];  //è¯ä»¶æ‰«æå›¾ç‰‡å…¨å›¾
+	char szName[32];			//·Ã¿ÍĞÕÃû
+	char szSex[4];				//·Ã¿ÍĞÔ±ğ
+	char szFolk[10];			//·Ã¿ÍÃñ×å
+	char szPhone[16];			//·Ã¿Íµç»°
+	char szIDType[32];			//Ö¤¼şÀàĞÍ
+	char szID[30];				//Ö¤¼şºÅÂë
+	char szSignDepartment[60];	//·Ã¿ÍÖ¤¼şµÄÇ©·¢»ú¹Ø
+	char szWithGoods[60];		//Ğ¯´øµÄÎïÆ·
+	char szReason[40];			//À´·ÃÔ­Òò
+	char szAddr[100];			//·Ã¿ÍµØÖ·
+	char szTotalPeople[8];		//À´·ÃÈËÊı
+	char szUnit[100];			//·Ã¿Íµ¥Î»
+	char szJob[50];             //·Ã¿ÍÖ°Òµ   ´ó»ªĞèÇó 20160808 cc
+	char szCarNum[20];			//·Ã¿Í³µÅÆºÅÂë
+	char szBarCode[32];			//·ÃÎÊµ¥µÄÌõÂë
+	char szToOfficialName[32];	//±»·ÃÎÊÈËĞÕÃû
+	long lVisiteTime;			//À´·ÃÊ±¼ä
+	long lLeftTime;				//Àë¿ªÊ±¼ä
+	char szVisitStation[32];	//·Ã¿Í¾­ÓÉÄÇ¸öÃÅ¸Ú½øÈë
+	char szUserVideoPic[256];	//·Ã¿ÍÊÓÆµÕÕÆ¬µÄ´æ·ÅµØÖ·
+	char szUserIDPic[256];		//·Ã¿ÍÖ¤¼şÕÕÆ¬µÄ´æ·ÅµØÖ·
+	char szUserHeadPic[256];	//·Ã¿ÍÍ·²¿ÕÕÆ¬µÄ´æ·ÅµØÖ·
+	char szUserIDFullPic[256];  //Ö¤¼şÉ¨ÃèÍ¼Æ¬È«Í¼
 
-	char szToOfficeName[64];	//è¢«è®¿é—®éƒ¨é—¨
-	char szToRoom[32];			//è¢«è®¿äººæˆ¿é—´å·
-	char szValidDate[64];		//æœ‰æ•ˆæœŸé™
-	char szID2Flag[8];			//äºŒä»£è¯çš„è¯»å†™æ–¹å¼(0ï¼šä¸æ˜¯äºŒä»£è¯ï¼›1ï¼šé˜…è¯»å™¨é˜…è¯»çš„äºŒä»£è¯ï¼›2ï¼šæ‰«æçš„äºŒä»£è¯)
-	char szBirth[32];			//ç”Ÿæ—¥
-	int  nStatus;               //çŠ¶æ€
-	char szNote[200];           //å…¶ä»–è¯´æ˜
-	char szType[50];            //è®¿å®¢ç±»å‹
+	char szToOfficeName[64];	//±»·ÃÎÊ²¿ÃÅ
+	char szToRoom[32];			//±»·ÃÈË·¿¼äºÅ
+	char szValidDate[64];		//ÓĞĞ§ÆÚÏŞ
+	char szID2Flag[8];			//¶ş´úÖ¤µÄ¶ÁĞ´·½Ê½(0£º²»ÊÇ¶ş´úÖ¤£»1£ºÔÄ¶ÁÆ÷ÔÄ¶ÁµÄ¶ş´úÖ¤£»2£ºÉ¨ÃèµÄ¶ş´úÖ¤)
+	char szBirth[32];			//ÉúÈÕ
+	int  nStatus;               //×´Ì¬
+	char szNote[200];           //ÆäËûËµÃ÷
+	char szType[50];            //·Ã¿ÍÀàĞÍ
 
 	char szToSSO[30];
 } VISITORINFO;
@@ -235,11 +237,11 @@ VISITORINFO g_Printvisitor;
 
 typedef struct tagPicPath
 {
-	char szUserVideoPic[256];	//è®¿å®¢è§†é¢‘ç…§ç‰‡çš„å­˜æ”¾åœ°å€
-	char szUserIDPic[256];		//è®¿å®¢è¯ä»¶ç…§ç‰‡çš„å­˜æ”¾åœ°å€
-	char szUserHeadPic[256];	//è®¿å®¢å¤´éƒ¨ç…§ç‰‡çš„å­˜æ”¾åœ°å€
-	char szUserIDFullPic[256];  //è¯ä»¶æ‰«æå›¾ç‰‡å…¨å›¾
-	//char szUserBarCodePic[256]; //æ¡ç 
+	char szUserVideoPic[256];	//·Ã¿ÍÊÓÆµÕÕÆ¬µÄ´æ·ÅµØÖ·
+	char szUserIDPic[256];		//·Ã¿ÍÖ¤¼şÕÕÆ¬µÄ´æ·ÅµØÖ·
+	char szUserHeadPic[256];	//·Ã¿ÍÍ·²¿ÕÕÆ¬µÄ´æ·ÅµØÖ·
+	char szUserIDFullPic[256];  //Ö¤¼şÉ¨ÃèÍ¼Æ¬È«Í¼
+	//char szUserBarCodePic[256]; //ÌõÂë
 }PICPATH;
 
 PICPATH g_VisitorPic;
@@ -295,22 +297,22 @@ PrintTipsCfg g_PrintTipsCfg;
 
 typedef struct _j7100_registry_
 {
-    char 	card1[16], 			//å¡å·1
-        	card2[16], 			//å¦‚ä¸ºå•å¡æ³¨å†Œï¼Œä¸éœ€è¦
-        	psw[8];    			//å•å¡æ³¨å†Œæ—¶çš„é—¨ç¦å¯†ç 
+    char 	card1[16], 			//¿¨ºÅ1
+        	card2[16], 			//ÈçÎªµ¥¿¨×¢²á£¬²»ĞèÒª
+        	psw[8];    			//µ¥¿¨×¢²áÊ±µÄÃÅ½ûÃÜÂë
      int  	security,  
-        	team;       		//æŒå¡äººåˆ†ç»„ç®¡ç†åºå·, æœ€å¤šåˆ†16ç»„, å€¼èŒƒå›´:0-15.
+        	team;       		//³Ö¿¨ÈË·Ö×é¹ÜÀíĞòºÅ, ×î¶à·Ö16×é, Öµ·¶Î§:0-15.
     char 	acce[32];
-    int 		year, month,day;	//è¯¥æ¡æ³¨å†Œçš„æœ‰æ•ˆæœŸ
+    int 		year, month,day;	//¸ÃÌõ×¢²áµÄÓĞĞ§ÆÚ
 }J7100REGISTRY;
-typedef struct _devicewatch_//å®æ—¶ç›‘æ§æ•°æ®
+typedef struct _devicewatch_//ÊµÊ±¼à¿ØÊı¾İ
 {
-    char card[10],      //åˆ·å¡å¡å·
-    mgs[64],    //ç›‘æ§æ•°æ®æè¿°.
-    date[12],   //åˆ·å¡æ—¥æœŸ
-    time[10];   //åˆ·å¡æ—¶é—´
-    int card_source;    //åˆ·å¡å¡ç±»å‹.
-    int err;    //é”™è¯¯å€¼.=0åˆæ³•æ•°æ®.<0éæ³•æ•°æ®.
+    char card[10],      //Ë¢¿¨¿¨ºÅ
+    mgs[64],    //¼à¿ØÊı¾İÃèÊö.
+    date[12],   //Ë¢¿¨ÈÕÆÚ
+    time[10];   //Ë¢¿¨Ê±¼ä
+    int card_source;    //Ë¢¿¨¿¨ÀàĞÍ.
+    int err;    //´íÎóÖµ.=0ºÏ·¨Êı¾İ.<0·Ç·¨Êı¾İ.
 }DeviceWatch;
 
 
@@ -339,6 +341,7 @@ extern BOOL QueryEmployer(HELE hEle);
 extern HBITMAP CopyScreenToBitmap(LPRECT lpRect);
 extern BOOL ExecPro(char * cmdline, BOOL bAsyncFlag, PROCESS_INFORMATION *ppi);
 
+DWORD WINAPI GetSQLThread(LPVOID lpVoid);
 DWORD WINAPI GetDataThread(LPVOID lpVoid);
 DWORD WINAPI SendTimeThread(LPVOID lpVoid);
 DWORD WINAPI ReadChannelRegThread(LPVOID lpVoid);
@@ -347,18 +350,18 @@ extern BOOL SendBackScreenAppData(char *pszData);
 extern BOOL GetEditData(int nType, char *pszOut);
 extern void SetOfficialInfo();
 extern BOOL CreateReceiptHtml(const VISITORINFO &visitor, char *pszFile);
-extern BOOL CreateReceiptHtml2(const VISITORINFO &visitor, char *pszFile);  //ç®€æ´ç‰ˆä¼šå®¢å•
-extern BOOL CreateReceiptTipsPB(const VISITORINFO &visitor);   //é€šè¿‡PBæ‰“å°å‡­æ¡
-extern BOOL CreateVisitorInfTipsUptoServer(const VISITORINFO &visitor); //åˆ›å»ºä¸Šä¼ çš„è®¿å®¢ä¿¡æ¯
+extern BOOL CreateReceiptHtml2(const VISITORINFO &visitor, char *pszFile);  //¼ò½à°æ»á¿Íµ¥
+extern BOOL CreateReceiptTipsPB(const VISITORINFO &visitor);   //Í¨¹ıPB´òÓ¡Æ¾Ìõ
+extern BOOL CreateVisitorInfTipsUptoServer(const VISITORINFO &visitor); //´´½¨ÉÏ´«µÄ·Ã¿ÍĞÅÏ¢
 
 extern BOOL CreateNoFrameReceiptHtml(const VISITORINFO &visitor, char *pszFile);
 
-extern BOOL CreateVisitorRequestHtml(const VISITORINFO &visitor, char *pszFile); //å‘åˆ°ç»ˆç«¯çš„ä¼šå®¢è¯·æ±‚å•
+extern BOOL CreateVisitorRequestHtml(const VISITORINFO &visitor, char *pszFile); //·¢µ½ÖÕ¶ËµÄ»á¿ÍÇëÇóµ¥
 extern void PrintHtmlPage(char *pszURL);
 extern BOOL SaveAndPrint();
 extern void SetStationInfo(int nResID);
 
-extern long CALLBACK SendRequestToOfficial(char *pszFile);
+extern long  SendRequestToOfficial(char *pszFile);
 extern void UpdateAddressTable();
 extern void SetVisitorInfo(const VISITORINFO &visitor);
 extern void SetOfficialInfo(const OFFICIALINFO &official);
@@ -382,8 +385,8 @@ extern BOOL CALLBACK OnShowFolk(HELE hEle, HELE hEventEle);
 extern BOOL CALLBACK OnIDTypeCombSelect(HELE hEle, HELE hEventEle, int nIndex);
 extern BOOL CALLBACK OnChaxunTongjiList(HELE hEle, HELE hEventEle, int nIndex);
 extern BOOL CALLBACK OnTongjiChaxunReturn(HELE hEle, HELE hEventEle);
-extern BOOL CALLBACK OnTongji(HELE hEle, HELE hEventEle);		//ç»Ÿè®¡æŸ¥è¯¢é¡µé¢çš„ç»Ÿè®¡æŒ‰é’®
-extern BOOL CALLBACK OnChaxun(HELE hEle, HELE hEventEle);		//ç»Ÿè®¡æŸ¥è¯¢é¡µé¢çš„æŸ¥è¯¢æŒ‰é’®
+extern BOOL CALLBACK OnTongji(HELE hEle, HELE hEventEle);		//Í³¼Æ²éÑ¯Ò³ÃæµÄÍ³¼Æ°´Å¥
+extern BOOL CALLBACK OnChaxun(HELE hEle, HELE hEventEle);		//Í³¼Æ²éÑ¯Ò³ÃæµÄ²éÑ¯°´Å¥
 extern BOOL CALLBACK OnExportVisitor(HELE hEle, HELE hEventEle);
 
 extern BOOL CALLBACK OnDocComplete(HXCGUI hWebBrowser,in_ IDispatch *pDisp,in_ wchar_t *pUrl);
@@ -392,8 +395,8 @@ extern BOOL CALLBACK OnSetBlackName(HELE hEle, HELE hEventEle);
 extern BOOL CALLBACK OnDelBlackName(HELE hEle, HELE hEventEle);
 extern BOOL CALLBACK OnCloseBlackName(HELE hEle, HELE hEventEle);
 
-extern BOOL CALLBACK OnOutResponse(HWINDOW hWindow, WPARAM wParam, LPARAM lParam);  //æ˜¾ç¤ºå¤–æ¥æ¶ˆæ¯
-extern BOOL CALLBACK OnLogOutBtnClick(HELE hEle, HELE hEventEle); //æ‰‹åŠ¨ç­¾ç¦»å•æ¡è®°å½•
+extern BOOL CALLBACK OnOutResponse(HWINDOW hWindow, WPARAM wParam, LPARAM lParam);  //ÏÔÊ¾Íâ½ÓÏûÏ¢
+extern BOOL CALLBACK OnLogOutBtnClick(HELE hEle, HELE hEventEle); //ÊÖ¶¯Ç©Àëµ¥Ìõ¼ÇÂ¼
 
 extern BOOL CALLBACK OnLSBtnClick(HELE hEle, HELE hEventEle);
 extern BOOL CALLBACK OnXCBtnClick(HELE hEle, HELE hEventEle);
@@ -403,13 +406,13 @@ extern BOOL CALLBACK OnQTBtnClick(HELE hEle, HELE hEventEle);
 extern BOOL CALLBACK OnReCallBtnClick(HELE hEle, HELE hEventEle);
 extern BOOL CALLBACK OnAllReCallBtnClick(HELE hEle, HELE hEventEle);
 
-extern BOOL CALLBACK OnAllLogOutBtnClick(HELE hEle, HELE hEventEle);//å…¨éƒ¨ç­¾ç¦»
-extern BOOL CALLBACK OnCloseLogOutBtnClick(HELE hEle, HELE hEventEle); //å…³é—­è‡ªèº«å¯¹è¯æ¡†
-extern BOOL CALLBACK OnOKBtnClick(HELE hEle, HELE hEventEle);      //è¿›å…¥æŸ¥è¯¢ç•Œé¢å¯†ç ç¡®è®¤
-extern BOOL CALLBACK OnOKSysBtnClick(HELE hEle, HELE hEventEle);   //è¿›å…¥åå°è®¾ç½®é¡µé¢
+extern BOOL CALLBACK OnAllLogOutBtnClick(HELE hEle, HELE hEventEle);//È«²¿Ç©Àë
+extern BOOL CALLBACK OnCloseLogOutBtnClick(HELE hEle, HELE hEventEle); //¹Ø±Õ×ÔÉí¶Ô»°¿ò
+extern BOOL CALLBACK OnOKBtnClick(HELE hEle, HELE hEventEle);      //½øÈë²éÑ¯½çÃæÃÜÂëÈ·ÈÏ
+extern BOOL CALLBACK OnOKSysBtnClick(HELE hEle, HELE hEventEle);   //½øÈëºóÌ¨ÉèÖÃÒ³Ãæ
  
-extern BOOL CALLBACK OnCloseDevice(HELE hEle, HELE hEventEle);  //å…³é—­ç”µè„‘è®¾å¤‡
-extern BOOL CALLBACK OnCloseApp(HELE hEle, HELE hEventEle); //å…³é—­ç¨‹åº
+extern BOOL CALLBACK OnCloseDevice(HELE hEle, HELE hEventEle);  //¹Ø±ÕµçÄÔÉè±¸
+extern BOOL CALLBACK OnCloseApp(HELE hEle, HELE hEventEle); //¹Ø±Õ³ÌĞò
 
 extern BOOL CALLBACK OnLoginOK(HELE hEle, HELE hEventEle);
 extern BOOL CALLBACK OnLoginNo(HELE hEle, HELE hEventEle);
@@ -431,7 +434,7 @@ extern BOOL CALLBACK OnExportOfficial(HELE hEle, HELE hEventEle);
 extern BOOL CALLBACK OnSaveOfficial(HELE hEle, HELE hEventEle);
 extern BOOL CALLBACK OnOfficialList(HELE hEle, HELE hEventEle, int nIndex);
 
-extern BOOL CALLBACK OnICUnReg(HELE hEle, HELE hEventEle);  //å¤§åéœ€æ±‚ï¼Œè§£é™¤ICå¡ç»‘å®š
+extern BOOL CALLBACK OnICUnReg(HELE hEle, HELE hEventEle);  //´ó»ªĞèÇó£¬½â³ıIC¿¨°ó¶¨
 
 extern BOOL CALLBACK OnImportBlackName(HELE hEle, HELE hEventEle);
 extern BOOL CALLBACK OnExportBlackName(HELE hEle, HELE hEventEle);
@@ -460,28 +463,28 @@ extern BOOL CALLBACK OnSaveOffice(HELE hEle, HELE hEventEle);
 extern BOOL CALLBACK OnSaveLevel(HELE hEle, HELE hEventEle);
 extern BOOL CALLBACK OnOfficeLevel(HELE hEle, HELE hEventEle, int nIndex);
 
-extern BOOL CALLBACK OnScanID2(HELE hEle, HELE hEventEle);			//æ‰«æäºŒä»£è¯
-extern BOOL CALLBACK OnScanID(HELE hEle, HELE hEventEle);			//æ‰«æä¸€ä»£èº«ä»½è¯
-extern BOOL CALLBACK OnScanLawyer(HELE hEle, HELE hEventEle);		//æ‰«æå¾‹å¸ˆè¯
-extern BOOL CALLBACK OnScanPassPort(HELE hEle, HELE hEventEle);		//æ‰«ææŠ¤ç…§
-extern BOOL CALLBACK OnScanToHKPassPort(HELE hEle, HELE hEventEle);	//æ‰«ææ¸¯æ¾³é€šè¡Œè¯
-extern BOOL CALLBACK OnScanHKID(HELE hEle, HELE hEventEle);			//æ‰«æå›ä¹¡è¯
-extern BOOL CALLBACK OnScanTaiWanPassPort(HELE hEle, HELE hEventEle);	//æ‰«æå°èƒè¯
-extern BOOL CALLBACK OnScanOther(HELE hEle, HELE hEventEle);			//æ‰«æå…¶ä»–è¯ä»¶
+extern BOOL CALLBACK OnScanID2(HELE hEle, HELE hEventEle);			//É¨Ãè¶ş´úÖ¤
+extern BOOL CALLBACK OnScanID(HELE hEle, HELE hEventEle);			//É¨ÃèÒ»´úÉí·İÖ¤
+extern BOOL CALLBACK OnScanLawyer(HELE hEle, HELE hEventEle);		//É¨ÃèÂÉÊ¦Ö¤
+extern BOOL CALLBACK OnScanPassPort(HELE hEle, HELE hEventEle);		//É¨Ãè»¤ÕÕ
+extern BOOL CALLBACK OnScanToHKPassPort(HELE hEle, HELE hEventEle);	//É¨Ãè¸Û°ÄÍ¨ĞĞÖ¤
+extern BOOL CALLBACK OnScanHKID(HELE hEle, HELE hEventEle);			//É¨Ãè»ØÏçÖ¤
+extern BOOL CALLBACK OnScanTaiWanPassPort(HELE hEle, HELE hEventEle);	//É¨ÃèÌ¨°ûÖ¤
+extern BOOL CALLBACK OnScanOther(HELE hEle, HELE hEventEle);			//É¨ÃèÆäËûÖ¤¼ş
 
-extern BOOL CALLBACK OnScanBusinessCard(HELE hEle, HELE hEventEle);         //æ‰«æåç‰‡
-extern BOOL CALLBACK OnScanDriverLicense(HELE hEle, HELE hEventEle);    //æ‰«æé©¾é©¶è¯
-extern BOOL CALLBACK OnReturnMain(HELE hEle, HELE hEventEle);			//è¿”å›
+extern BOOL CALLBACK OnScanBusinessCard(HELE hEle, HELE hEventEle);         //É¨ÃèÃûÆ¬
+extern BOOL CALLBACK OnScanDriverLicense(HELE hEle, HELE hEventEle);    //É¨Ãè¼İÊ»Ö¤
+extern BOOL CALLBACK OnReturnMain(HELE hEle, HELE hEventEle);			//·µ»Ø
 
-extern BOOL CALLBACK OnOfficialSet(HELE hEle, HELE hEventEle);		//å¢åŠ äººå‘˜ä¿¡æ¯é¡µé¢
-extern BOOL CALLBACK OnBlackSet(HELE hEle, HELE hEventEle);			//å¢åŠ é»‘åå•ä¿¡æ¯é¡µé¢
-extern BOOL CALLBACK OnGoodsSet(HELE hEle, HELE hEventEle);			//å¢åŠ ç‰©å“ä¿¡æ¯é¡µé¢
-extern BOOL CALLBACK OnSysConfig(HELE hEle, HELE hEventEle);			//ç³»ç»Ÿå‚æ•°è®¾ç½®é¡µé¢
-extern BOOL CALLBACK OnBaseInfo(HELE hEle, HELE hEventEle);			//åŸºæœ¬ä¿¡æ¯é¡µé¢
-extern BOOL CALLBACK OnReturnSet(HELE hEle, HELE hEventEle);			//ç³»ç»Ÿè®¾ç½®(å‚æ•°ç»´æŠ¤)é¡µé¢ä¸Šçš„è¿”å›
+extern BOOL CALLBACK OnOfficialSet(HELE hEle, HELE hEventEle);		//Ôö¼ÓÈËÔ±ĞÅÏ¢Ò³Ãæ
+extern BOOL CALLBACK OnBlackSet(HELE hEle, HELE hEventEle);			//Ôö¼ÓºÚÃûµ¥ĞÅÏ¢Ò³Ãæ
+extern BOOL CALLBACK OnGoodsSet(HELE hEle, HELE hEventEle);			//Ôö¼ÓÎïÆ·ĞÅÏ¢Ò³Ãæ
+extern BOOL CALLBACK OnSysConfig(HELE hEle, HELE hEventEle);			//ÏµÍ³²ÎÊıÉèÖÃÒ³Ãæ
+extern BOOL CALLBACK OnBaseInfo(HELE hEle, HELE hEventEle);			//»ù±¾ĞÅÏ¢Ò³Ãæ
+extern BOOL CALLBACK OnReturnSet(HELE hEle, HELE hEventEle);			//ÏµÍ³ÉèÖÃ(²ÎÊıÎ¬»¤)Ò³ÃæÉÏµÄ·µ»Ø
 extern BOOL CALLBACK OnQueryEmployerForList(HELE hEle, HELE hEventEle);
 
-extern BOOL CALLBACK OnSaveOther(HELE hEle, HELE hEventEle); //ç³»ç»Ÿè®¾ç½®é¡µé¢å…¶ä»–é¡¹çš„ä¿å­˜æ•°æ®
+extern BOOL CALLBACK OnSaveOther(HELE hEle, HELE hEventEle); //ÏµÍ³ÉèÖÃÒ³ÃæÆäËûÏîµÄ±£´æÊı¾İ
 extern BOOL CALLBACK OnConfigSave(HELE hEle, HELE hEventEle);
 extern void CALLBACK TimerMsgBox(HWND   hwnd,UINT   message,UINT   iTIMERID,DWORD   dwTIMER);
 
@@ -490,7 +493,7 @@ extern BOOL CALLBACK OnSelectCombox(HELE hEle,HELE hEventEle);
 
 extern LRESULT CALLBACK FrameCallBack(HWND hWnd, LPVIDEOHDR lpVHdr);
 
-extern BOOL CALLBACK OnCompareFace(HWINDOW hWindow, WPARAM wParam, LPARAM lParam); //äººè„¸è¯†åˆ«å¯¹æ¯”
+extern BOOL CALLBACK OnCompareFace(HWINDOW hWindow, WPARAM wParam, LPARAM lParam); //ÈËÁ³Ê¶±ğ¶Ô±È
 
 extern BOOL CheckIsBlackName2(VISITORINFO &visitor);
 extern BOOL CheckBlackName(const VISITORINFO &visitor);
@@ -499,9 +502,9 @@ extern void GetDate_Out(char *pszDate);
 extern BOOL StartKeybd();
 extern BOOL StartPrintTipsPB();
 extern BOOL StartUptoServer();
-extern BOOL CallLeft2Server(char *szName,char *szID,char *visitetime,char *lefttime,char *barcode); //è¿œç¨‹ç­¾ç¦»
-extern BOOL BuildQRGenerator(char *szQRValue); //äºŒç»´ç ç”Ÿæˆå™¨
-extern BOOL CallFS533Bin(char *szParam); //è°ƒç”¨fs533æ‰«æä»ª
+extern BOOL CallLeft2Server(char *szName,char *szID,char *visitetime,char *lefttime,char *barcode); //Ô¶³ÌÇ©Àë
+extern BOOL BuildQRGenerator(char *szQRValue); //¶şÎ¬ÂëÉú³ÉÆ÷
+extern BOOL CallFS533Bin(char *szParam); //µ÷ÓÃfs533É¨ÃèÒÇ
 
 extern BOOL StartZTScanner();
 extern BOOL StartYunMaiOCR();
@@ -509,10 +512,12 @@ extern BOOL StartFaceScaner();
 extern BOOL StartFaceCompare();
 
 extern int GetTcpBarAndUpVisitorInfo();
-extern int  GetTcpCardScan(int type,IDCARD_ALL &visitorID2Card); //è°ƒç”¨TCPæ–¹å¼æ‰«æä»ª
+extern int  GetTcpCardScan(int type,IDCARD_ALL &visitorID2Card); //µ÷ÓÃTCP·½Ê½É¨ÃèÒÇ
 
 extern bool getCardXmlInfo(char *xmlbuf,IDCARD_ALL &visitorID2Card);
 extern bool getVisitor2Xml(char *xml,VISITORINFO &visitor,char *ip);
+
+extern bool getYueJSon(char *js,VISITORINFO &visitor);
 
 extern BOOL GetBarCodePic(char *szBarCode);
 
@@ -564,7 +569,6 @@ extern BOOL CloseSoftKeybd();
 extern BOOL CloseBackScreen();
 extern BOOL CloseXYB();
 extern int  RePlayCapture();
-extern void ReOpenUSBCamera();
 
 extern BOOL ImportIDType(char *pszFileName);
 extern BOOL ImportOfficial(char *pszFileName);
@@ -588,16 +592,16 @@ extern BOOL ExportLevel(char *pszFileName);
 extern BOOL ExportIDType(char *pszFileName);
 
 extern BOOL ExportVisitor(char *pszFileName);
-extern void InitalVisitorExp();    //åˆå§‹åŒ–å¯¼å‡ºä¼šå®¢å•æ ¼å¼
-extern void InitalPrintTipsCfg();  //åˆå§‹åŒ–ä¼šå®¢å•æ ¼å¼
+extern void InitalVisitorExp();    //³õÊ¼»¯µ¼³ö»á¿Íµ¥¸ñÊ½
+extern void InitalPrintTipsCfg();  //³õÊ¼»¯»á¿Íµ¥¸ñÊ½
 
-extern BOOL OpenXlsDlg(char *szFileName);   //æ‰“å¼€XLSæ–‡ä»¶è·¯å¾„å¯¹è¯æ¡†
-extern BOOL SaveXlsDlg(CString &m_pathDir);   //ä¿å­˜XLSæ–‡ä»¶å¯¼å‡ºè·¯å¾„
+extern BOOL OpenXlsDlg(char *szFileName);   //´ò¿ªXLSÎÄ¼şÂ·¾¶¶Ô»°¿ò
+extern BOOL SaveXlsDlg(CString &m_pathDir);   //±£´æXLSÎÄ¼şµ¼³öÂ·¾¶
 
 extern BOOL OpenRegCardCom(int nPort);
 extern BOOL OperateRegCard(char* szIp,char* szCard,int nOperateType);
 
-extern void EnableScanBtns(BOOL isEnable); //æ‰«ææ—¶è¯ä»¶æŒ‰é’®æ§åˆ¶
+extern void EnableScanBtns(BOOL isEnable); //É¨ÃèÊ±Ö¤¼ş°´Å¥¿ØÖÆ
 
 extern void FtpConnect();
 
