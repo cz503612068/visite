@@ -28,6 +28,7 @@ CAsyncSocket *g_UDPSock;
 CString sCONNSTR_MYSQL;
 CString sFolk[62];
 
+
 int g_nCaptureTick = 30;          //设置视屏计时器时长为60s
 int g_nIDType;					//证件的种类
 int g_nSqlConnectType;          //数据库连接方式
@@ -35,16 +36,17 @@ bool g_bStopID2;				//停止二代证读写器的寻卡
 bool g_bStopBarCode;			//停止条码扫描七
 bool g_bScanerISOK;				//扫描仪是否正常
 bool g_bQRcode;                 //二维码读取记录
+static char g_szComBarcode[10000];
+
 char g_szHistVisitorName[50];   //历史来访列表访客名
 char g_szVisitorName[50];		//来访人的姓名
 char g_szOfficialIP[20];        //被访人IP
 static char g_szXmlInfo[1024];
-static char g_szComBarcode[10000];
+
 char g_szRecord[32];            //视频发送请求“来访编号”
 char g_szICCode[10];            //门禁IC物理号
 char g_szStation[50];           //门卫名
 char g_szOfficialID[20];        //被访人ID
-char g_szQRvisitime[512] = {'\0'}; //二维码预约来访时间
 bool g_bStartClipScreen;
 bool g_bShowCap;                //摄像头是否显示
 bool g_bCalled;                 //保存访客信息
@@ -55,8 +57,8 @@ bool g_bVisitorType;             //来访人数 -> 来访类型
 
 bool g_bSSO;                    //大华特殊需求SSO  
 
-bool g_bFaceCompare;
 bool g_bExpireData;              //数据过期清理
+bool g_bFaceCompare;
 
 int g_nComboBoxCount;			//列表框的总数据行数
 int g_nTableType;				//删除等操作时的表类型
@@ -215,7 +217,6 @@ typedef struct tagVisitorInfo
 	char szCarNum[20];			//访客车牌号码
 	char szBarCode[32];			//访问单的条码
 	char szToOfficialName[32];	//被访问人姓名
-	char szToOfficialPhone[16]; //被访人电话号码
 	long lVisiteTime;			//来访时间
 	long lLeftTime;				//离开时间
 	char szVisitStation[32];	//访客经由那个门岗进入
@@ -225,6 +226,7 @@ typedef struct tagVisitorInfo
 	char szUserIDFullPic[256];  //证件扫描图片全图
 
 	char szToOfficeName[64];	//被访问部门
+	char szToOfficialPhone[16];   //被访人电话
 	char szToRoom[32];			//被访人房间号
 	char szValidDate[64];		//有效期限
 	char szID2Flag[8];			//二代证的读写方式(0：不是二代证；1：阅读器阅读的二代证；2：扫描的二代证)
@@ -232,6 +234,7 @@ typedef struct tagVisitorInfo
 	int  nStatus;               //状态
 	char szNote[200];           //其他说明
 	char szType[50];            //访客类型
+	char szYueTime[16];         //预约时间
 
 	char szToSSO[30];
 } VISITORINFO;
@@ -343,8 +346,8 @@ extern BOOL QueryEmployer(HELE hEle);
 
 extern HBITMAP CopyScreenToBitmap(LPRECT lpRect);
 extern BOOL ExecPro(char * cmdline, BOOL bAsyncFlag, PROCESS_INFORMATION *ppi);
-extern BOOL getYueJSon(char *js,VISITORINFO &visitor);
 
+DWORD WINAPI GetSQLThread(LPVOID lpVoid);
 DWORD WINAPI GetDataThread(LPVOID lpVoid);
 DWORD WINAPI SendTimeThread(LPVOID lpVoid);
 DWORD WINAPI ReadChannelRegThread(LPVOID lpVoid);
@@ -364,8 +367,7 @@ extern void PrintHtmlPage(char *pszURL);
 extern BOOL SaveAndPrint();
 extern void SetStationInfo(int nResID);
 
-//extern long CALLBACK SendRequestToOfficial(char *pszFile);
-extern long SendRequestToOfficial(char *pszFile);
+extern long  SendRequestToOfficial(char *pszFile);
 extern void UpdateAddressTable();
 extern void SetVisitorInfo(const VISITORINFO &visitor);
 extern void SetOfficialInfo(const OFFICIALINFO &official);
@@ -521,6 +523,8 @@ extern int  GetTcpCardScan(int type,IDCARD_ALL &visitorID2Card); //调用TCP方式扫
 extern bool getCardXmlInfo(char *xmlbuf,IDCARD_ALL &visitorID2Card);
 extern bool getVisitor2Xml(char *xml,VISITORINFO &visitor,char *ip);
 
+extern bool getYueJSon(char *js,VISITORINFO &visitor);
+
 extern BOOL GetBarCodePic(char *szBarCode);
 
 extern BOOL StartBackScreen();
@@ -571,7 +575,6 @@ extern BOOL CloseSoftKeybd();
 extern BOOL CloseBackScreen();
 extern BOOL CloseXYB();
 extern int  RePlayCapture();
-extern void ReOpenUSBCamera();
 
 extern BOOL ImportIDType(char *pszFileName);
 extern BOOL ImportOfficial(char *pszFileName);

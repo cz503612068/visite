@@ -204,6 +204,119 @@ bool getNodeXmlInfo(char *xmlbuf,char *pic,char *node)
 	return true;
 }
 
+bool getYueJSon(char *js,VISITORINFO &visitor)
+{
+	//char text[] = "{\"timestamp\":\"2013-11-19T08:50:11\",\"value\":1}";
+	cJSON *json , *json_value , *json_timestamp;
+    // 解析数据包
+    json = cJSON_Parse(js);
+    if (!json)
+    {
+        //printf("Error before: [%s]\n",cJSON_GetErrorPtr());
+		return false;
+    }
+    else
+    {
+        // 解析开关值 //访客预约串都是字符值
+		//访客姓名
+        json_value = cJSON_GetObjectItem( json , "vn");		
+		strcpy(visitor.szName,json_value->valuestring);
+		//被访人姓名
+     		//被访人姓名
+        json_value = cJSON_GetObjectItem( json , "in");
+		try
+		{
+			strcmp(json_value->valuestring , "");
+			strcpy(visitor.szToOfficialName,json_value->valuestring);
+
+		}
+		catch (...)
+		{
+			//XMessageBox(g_hWindow, L"来访人名字为空", L"提示");
+		}
+	
+        //被访人手机
+		json_value = cJSON_GetObjectItem( json , "im");
+		try
+		{
+			strcmp(json_value->valuestring , "");
+			strcpy(visitor.szToOfficialPhone,json_value->valuestring);
+
+		}
+		catch (...)
+		{
+			//XMessageBox(g_hWindow, L"来访人手机号码为空", L"提示");
+
+		}
+		
+        //访客手机
+		json_value = cJSON_GetObjectItem( json , "vm");
+		try
+		{
+			strcmp(json_value->valuestring , "");
+			strcpy(visitor.szPhone,json_value->valuestring);
+
+		}
+		catch (...)
+		{
+			//XMessageBox(g_hWindow, L"被访人手机号码为空", L"提示");
+		}
+
+		//来访时间
+		json_value = cJSON_GetObjectItem( json , "tm");
+		try
+		{
+			strcmp(json_value->valuestring , "");
+			strcpy(visitor.szYueTime,json_value->valuestring);
+		}
+		catch (...)
+		{
+			//XMessageBox(g_hWindow, L"无来访时间", L"提示");
+		}		
+		
+        //来访人数
+		json_value = cJSON_GetObjectItem( json , "pn");
+		try
+		{
+			strcmp(json_value->valuestring , "");
+			strcpy(visitor.szTotalPeople,json_value->valuestring);
+		}
+		catch (...)
+		{
+			//XMessageBox(g_hWindow, L"来访人数为空", L"提示");
+		}
+
+        //来访事由
+		json_value = cJSON_GetObjectItem( json , "rs");
+		try
+		{
+			strcmp(json_value->valuestring , "");
+			strcpy(visitor.szReason,json_value->valuestring);
+
+		}
+		catch (...)
+		{
+			//XMessageBox(g_hWindow, L"来访事由为空", L"提示");
+		}
+		
+		//车牌号码
+		json_value = cJSON_GetObjectItem( json , "lp");
+		try
+		{
+			strcmp(json_value->valuestring , "");
+			strcpy(visitor.szCarNum,json_value->valuestring);
+		}
+		catch (...)
+		{
+			//XMessageBox(g_hWindow, L"车牌号码为空", L"提示");
+		}
+        // 释放内存空间
+        cJSON_Delete(json);
+	}
+
+	return true;
+}
+
 bool getCardXmlInfo(char *xmlbuf,IDCARD_ALL &visitorID2Card)
 {
 	::CoInitialize(NULL);
@@ -351,7 +464,7 @@ BOOL CALLBACK OnHistoryVisitorList(HELE hEle, HELE hEventEle, int nIndex)
 
 	wchar_t wBuf[256] = {0};
 	char szT[512] = {'\0'};
-	long FldCount = 0, ret = 0;;
+	long FldCount = 0, ret = 0;
 	CString outParas[FLD_MAX];
 	CWinAdo tAdo(sCONNSTR_MYSQL);
 	
@@ -366,8 +479,8 @@ BOOL CALLBACK OnHistoryVisitorList(HELE hEle, HELE hEventEle, int nIndex)
 		outParas[i].Empty();
 	}
 
-	char szName[32] = {'\0'}, szID[64] = {'\0'}, szVisitTime[32] = {'\0'}, szOfficialName[32] = {'\0'}, szOfficeName[64] = {'\0'};
-	char szDate[32] = {'\0'}, szofficialduty[32] ={'\0'};
+	char szName[64] = {'\0'}, szID[64] = {'\0'}, szVisitTime[32] = {'\0'}, szOfficialName[64] = {'\0'}, szOfficeName[64] = {'\0'};
+	char szDate[64] = {'\0'}, szofficialduty[32] ={'\0'};
 	int n = XList_GetSelectItem(hEle);
 	memset((char *)wBuf, 0, sizeof(wBuf));
 	wcscpy(wBuf, XList_GetItemText(hEle, n, 1));
@@ -668,8 +781,8 @@ BOOL CALLBACK OnVisitorList(HELE hEle, HELE hEventEle, int nIndex)
 		outParas[i].Empty();
 	}
 
-	char szName[32] = {'\0'}, szID[64] = {'\0'}, szVisitTime[32] = {'\0'}, szOfficialName[32] = {'\0'}, szOfficeName[64] = {'\0'};
-	char szDate[32] = {'\0'};
+	char szName[64] = {'\0'}, szID[64] = {'\0'}, szVisitTime[32] = {'\0'}, szOfficialName[64] = {'\0'}, szOfficeName[64] = {'\0'};
+	char szDate[64] = {'\0'};
 	int n = nIndex;
 	memset((char *)wBuf, 0, sizeof(wBuf));
 	wcscpy(wBuf, XList_GetItemText(hEle, n, 2));
@@ -854,25 +967,45 @@ BOOL CALLBACK OnVisitorList(HELE hEle, HELE hEventEle, int nIndex)
 	Pause();
 	HideSoftKeybd();
 	XWnd_RedrawWnd(g_hWindow);
-	HWINDOW hWindow=XModalWnd_CreateWindow(410, 120, L"签离访客信息？", XWnd_GetHWnd(g_hWindow));
-	if(hWindow)
+	HWINDOW hWindow;
+	if(g_bAutoCallOfficials)
 	{
+		 hWindow=XModalWnd_CreateWindow(410, 120, L"签离访客信息？", XWnd_GetHWnd(g_hWindow));
+		if(hWindow)
+		{
+			HELE hButton=XBtn_Create(10,10,65,65,L"是",hWindow);//创建按钮
+			HELE hButton2=XBtn_Create(90,10,65,65,L"全部",hWindow);//创建按钮
+			HELE hButton3=XBtn_Create(170,10,65,65,L"否",hWindow);//创建按钮
+			XEle_RegisterEvent(hButton,XE_BNCLICK,OnLogOutBtnClick);//注册按钮点击事件
+			XEle_RegisterEvent(hButton2,XE_BNCLICK,OnAllLogOutBtnClick);
+			XEle_RegisterEvent(hButton3,XE_BNCLICK,OnCloseLogOutBtnClick);
 
-		HELE hButton=XBtn_Create(10,10,65,65,L"是",hWindow);//创建按钮
-        HELE hButton2=XBtn_Create(90,10,65,65,L"全部",hWindow);//创建按钮
-		HELE hButton3=XBtn_Create(170,10,65,65,L"否",hWindow);//创建按钮
-		XEle_RegisterEvent(hButton,XE_BNCLICK,OnLogOutBtnClick);//注册按钮点击事件
-        XEle_RegisterEvent(hButton2,XE_BNCLICK,OnAllLogOutBtnClick);
-		XEle_RegisterEvent(hButton3,XE_BNCLICK,OnCloseLogOutBtnClick);
-
-		//重新访问调度
-		HELE hButton4=XBtn_Create(250,10,65,65,L"指定重访",hWindow);//创建按钮
-        HELE hButton5=XBtn_Create(330,10,65,65,L"全部重访",hWindow);//创建按钮
-        XEle_RegisterEvent(hButton4,XE_BNCLICK,OnReCallBtnClick);
-		XEle_RegisterEvent(hButton5,XE_BNCLICK,OnAllReCallBtnClick);
-		//XWnd_ShowWindow(hWindow,SW_SHOW);//显示窗口
-		//XRunXCGUI();
+			//重新访问调度
+			HELE hButton4=XBtn_Create(250,10,65,65,L"指定重访",hWindow);//创建按钮
+			HELE hButton5=XBtn_Create(330,10,65,65,L"全部重访",hWindow);//创建按钮
+			XEle_RegisterEvent(hButton4,XE_BNCLICK,OnReCallBtnClick);
+			XEle_RegisterEvent(hButton5,XE_BNCLICK,OnAllReCallBtnClick);
+			//XWnd_ShowWindow(hWindow,SW_SHOW);//显示窗口
+			//XRunXCGUI();
+		}
 	}
+	else
+	{
+		 hWindow=XModalWnd_CreateWindow(250, 120, L"签离访客信息？", XWnd_GetHWnd(g_hWindow));
+		if(hWindow)
+		{
+
+			HELE hButton=XBtn_Create(10,10,65,65,L"是",hWindow);//创建按钮
+			HELE hButton2=XBtn_Create(90,10,65,65,L"全部",hWindow);//创建按钮
+			HELE hButton3=XBtn_Create(170,10,65,65,L"否",hWindow);//创建按钮
+			XEle_RegisterEvent(hButton,XE_BNCLICK,OnLogOutBtnClick);//注册按钮点击事件
+			XEle_RegisterEvent(hButton2,XE_BNCLICK,OnAllLogOutBtnClick);
+			XEle_RegisterEvent(hButton3,XE_BNCLICK,OnCloseLogOutBtnClick);
+			//XWnd_ShowWindow(hWindow,SW_SHOW);//显示窗口
+			//XRunXCGUI();
+		}
+	}
+
 	XWnd_SetBorderSize(hWindow, 3, 3, 3, 3);
 	//HIMAGE hImg = XImage_LoadFile(L".\\skin\\image\\frame.jpg", true);
 	//XWnd_SetImageNC(hWindow, hImg);
@@ -987,7 +1120,7 @@ void ChaXunToDayInfo()
 	}
 
 	wchar_t wBuf[128] = {'\0'};
-	char szOffice[64] = {'\0'}, szVisitor[32] = {'\0'}, szOfficial[32] = {'\0'}, szID[32] = {'\0'};
+	char szOffice[64] = {'\0'}, szVisitor[64] = {'\0'}, szOfficial[64] = {'\0'}, szID[64] = {'\0'};
 
 	HELE hE = GETELE(IDE_BEIFANGBUMEN);
 	XEdit_GetText(hE, wBuf, 128);
@@ -1150,9 +1283,9 @@ BOOL TongJiInfo()
 	long FldCount = 0, ret = 0;
 	CString outParas[FLD_MAX];
 	CWinAdo tAdo(sCONNSTR_MYSQL);
-	char szMaxOffice[32] = {'\0'}, szMaxOfficial[32] = {'\0'}, szMaxVisitor[32] = {'\0'};
-	char szMaxOfficeTimes[32] = {'\0'}, szMaxOfficialTimes[32] = {'\0'}, szMaxVisitorTimes[32] = {'\0'};
-	char szTodayTotalVisitor[32] = {'\0'}, szTotalVisitor[32] = {'\0'};
+	char szMaxOffice[64] = {'\0'}, szMaxOfficial[64] = {'\0'}, szMaxVisitor[64] = {'\0'};
+	char szMaxOfficeTimes[64] = {'\0'}, szMaxOfficialTimes[64] = {'\0'}, szMaxVisitorTimes[64] = {'\0'};
+	char szTodayTotalVisitor[64] = {'\0'}, szTotalVisitor[64] = {'\0'};
 	
 	ret = tAdo.OpenAdo();
 	if (ret != ADOOK)
@@ -1305,8 +1438,8 @@ BOOL CALLBACK OnChaxun(HELE hEle, HELE hEventEle)
 	}
 
 	wchar_t wBuf[128] = {'\0'};
-	char szOffice[64] = {'\0'}, szVisitor[32] = {'\0'}, szOfficial[32] = {'\0'}, szID[32] = {'\0'},szIDtype[32] = {'\0'};
-    char szVisitorType[32] = {'\0'};
+	char szOffice[64] = {'\0'}, szVisitor[64] = {'\0'}, szOfficial[64] = {'\0'}, szID[64] = {'\0'},szIDtype[32] = {'\0'};
+    char szVisitorType[64] = {'\0'};
 
 	memset((char *)wBuf, 0, sizeof(wBuf));
 	HELE hE = GETELE(IDE_BEIFANGBUMEN);
@@ -1777,10 +1910,10 @@ BOOL CALLBACK OnSendOfficialRequest(HELE hEle, HELE hEventEle)
 	VISITORINFO visitor;
 	wchar_t wBuf[256 + 1] = {0};
 	long n = 0;
-	char sz[32] = {'\0'};
-	char szFolkName[40] = {'\0'};
-	char szOfficialName[32] = {'\0'};
-	char szOfficeName[32] = {'\0'};
+	char sz[64] = {'\0'};
+	char szFolkName[64] = {'\0'};
+	char szOfficialName[64] = {'\0'};
+	char szOfficeName[64] = {'\0'};
 	long FldCount = 0;
 	CWinAdo tAdo(sCONNSTR_MYSQL);
 	
@@ -2463,7 +2596,7 @@ BOOL CALLBACK OnCallHandInput(HELE hEle, HELE hEventEle)
 
 BOOL CALLBACK OnVisitorLogOut(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
 {
-	SuspendThread(g_ThreadReadBarcode);
+		SuspendThread(g_ThreadReadBarcode);
 	char s[10000] = {'\0'};
 	//strcpy(s, (char *)lParam);
 	//::GetPrivateProfileString("Bar", "BarNumber", "",s,sizeof(s), CONFIG_FILE);
@@ -2478,7 +2611,13 @@ BOOL CALLBACK OnVisitorLogOut(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
 	if (GetAESJson(s,json) == 0)
 	{
 		CString cstr;
-        cstr.Format(g_szQRvisitime);
+		VISITORINFO visitor;
+		memset((char *)&visitor, 0, sizeof(VISITORINFO));
+		OFFICIALINFO official;
+		memset((char *)&official, 0, sizeof(OFFICIALINFO));
+		getYueJSon(json,visitor);
+
+        cstr.Format(visitor.szYueTime);
 		//cstr.Replace("T"," ");
 		cstr = cstr.Left(cstr.GetLength() - 14);
         CTime time = CTime::GetCurrentTime();
@@ -2486,7 +2625,7 @@ BOOL CALLBACK OnVisitorLogOut(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
 		//CString m_strTime = time.Format("%Y-%m-%d %H:%M:%S");
 		//m_strTime = m_strTime.Left(m_strTime.GetLength() - 9)
 		//CTimeSpan span=m_strTime-g_szQRvisitime;
-		if (cstr == m_strTime) //此处调试修改，后要改回来应改为： cstr != m_strTime
+		if (cstr != m_strTime) //此处调试修改，后要改回来应改为： cstr != m_strTime
 		{
 			XMessageBox(g_hWindow, L"来访日期和预约日期不是同一天!", L"错误");
 			ResumeThread(g_ThreadReadBarcode);
@@ -2495,11 +2634,8 @@ BOOL CALLBACK OnVisitorLogOut(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
 		else
 		{
 			InitVisitorData();
-			VISITORINFO visitor;
-			memset((char *)&visitor, 0, sizeof(VISITORINFO));
-			OFFICIALINFO official;
-			memset((char *)&official, 0, sizeof(OFFICIALINFO));
-			getYueJSon(json,visitor);
+
+			
 			SetVisitorInfo(visitor);
 			strcpy(official.szName,visitor.szToOfficialName);
 			SetOfficialInfo(official);
@@ -2518,24 +2654,49 @@ BOOL CALLBACK OnVisitorLogOut(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
 	{
 		VisitorLogOut(s);
 
-	    if (::GetPrivateProfileInt("TerminalSet", "bLeaveOfficial",0, CONFIG_FILE)==1)
+		if (::GetPrivateProfileInt("TerminalSet", "bLeaveOfficial",0, CONFIG_FILE)==1)
 		{
-		//清空来访人数据
-		  InitVisitorData();
+			//清空来访人数据
+			InitVisitorData();
 		}
-	    else
+		else
 		{
-		//清空所有数据
-		  InitData();
+			//清空所有数据
+			InitData();
 		}
 
-	    ShowWindow(g_hCapWnd, true);
-	    RePlayCapture();//RePlay();
+		ShowWindow(g_hCapWnd, true);
+		RePlayCapture();//RePlay();
 
 	    XWnd_RedrawWnd(g_hWindow);
 	    ResumeThread(g_ThreadReadBarcode);
 	    return false;
-	}	
+	}
+	/*
+	SuspendThread(g_ThreadReadBarcode);
+	char s[128] = {'\0'};
+	//strcpy(s, (char *)lParam);
+	//::GetPrivateProfileString("Bar", "BarNumber", "",s,sizeof(s), CONFIG_FILE);
+	VisitorLogOut(s);
+
+	if (::GetPrivateProfileInt("TerminalSet", "bLeaveOfficial",0, CONFIG_FILE)==1)
+	{
+		//清空来访人数据
+		InitVisitorData();
+	}
+	else
+	{
+		//清空所有数据
+		InitData();
+	}
+
+	ShowWindow(g_hCapWnd, true);
+	RePlayCapture();//RePlay();
+
+	XWnd_RedrawWnd(g_hWindow);
+	ResumeThread(g_ThreadReadBarcode);
+	*/
+	return false;
 }
 
 //选择了被访问人姓名后的消息响应接口
@@ -2549,25 +2710,39 @@ BOOL CALLBACK OnOfficialNameSelected(HWINDOW hWindow, WPARAM wParam, LPARAM lPar
 	return false;
 }
 
-void ReOpenUSBCamera()
+//右击启动摄像头
+BOOL CALLBACK OnCapture(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
 {
+	return false;
 	if (XEle_IsShowEle(g_hPage1))
 	{
-		if (g_nCaptureTick < 1)
+		if (g_nCaptureTick < 1 )
 		{
-
+			
 			VideoPreview2();
 			XEle_EnableEle(g_hTab1, true);
 		}
 		g_nCaptureTick = 30;
 	}
-}
+	else
+	{
+		/*
+		CloseCapture();
+		RECT rc;
+		rc.bottom = 40 + 40;
+		rc.right = 590 + 320;
+		rc.left = 590;
+		rc.top = 40;
+		//OpenCapture((long)XWnd_GetHWnd(g_hWindow),rc);
 
-//右击启动摄像头
-BOOL CALLBACK OnCapture(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
-{
-	ReOpenUSBCamera();
-	StartKeybd();
+
+
+		OpenCapture((long)XWnd_GetHWnd(g_hWindow), rc);
+		//g_nCaptureTick = 0;
+		//Pause();
+		//g_bVideoOpened = false;*/
+	}
+
 	return false;
 }
 
@@ -2776,6 +2951,7 @@ BOOL CALLBACK OnReadID2Over(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
 		char szTime[40] = {'\0'};
 		int v =::GetPrivateProfileInt("Info", "Value",80, ".\\FaceCompare\\faceCompare.ini");
 		//time((time_t *)&lefttime);
+		g_bStopCompare = true;
 		if((int)lParam > v)
 		{
 			g_bFaceCompare = true;
@@ -2803,13 +2979,14 @@ BOOL CALLBACK OnReadID2Over(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
 				hE = XWnd_GetEle(g_hWindow, IDP_HEADPIC2);		
 				XPic_SetImage(hE, NULL);
 				::DeleteFile(USER_HEAD_PIC);
-				//XBtn_SetText(g_hTab1, L"拍照比对");
+				XBtn_SetText(g_hTab1, L"拍照比对");
 				ShowWindow(g_hCapWnd, true);
 				RePlayCapture();//RePlay();
 				::DeleteFile(USER_VIDEO_PIC);
 				::DeleteFile(USER_HEAD_PIC); 
 				
-				::WritePrivateProfileString("Info", "bStopRead", "1", ".\\FaceCompare\\faceCompare.ini");
+				//::WritePrivateProfileString("Info", "bStopRead", "1", ".\\FaceCompare\\faceCompare.ini");
+				g_bStopCompare = false;
 			}
 		}
 
@@ -2846,11 +3023,10 @@ BOOL CALLBACK OnReadID2Over(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
 	::DeleteFile(USER_ID2_PIC);            
 	::DeleteFile(USER_ID_PIC); 
 	::DeleteFile(USER_BARCODE_PIC);
-	AfxMessageBox(g_stIDCard.name);
+
 	strcpy(visitor.szName, g_stIDCard.name);
 	strcpy(visitor.szID, g_stIDCard.number);
 	BOOL b = CheckVisitor(visitor);
-	AfxMessageBox(visitor.szID);
 	if (b)
 	{
 		wchar_t wBuf[256] = {0};
@@ -2874,19 +3050,17 @@ BOOL CALLBACK OnReadID2Over(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
 		time((time_t *)&lefttime);
 		sprintf(szTime, "%ld", lefttime);
 		CallLeft2Server(visitor.szName,visitor.szID,"",szTime,""); //远程签离调用
-		AfxMessageBox(visitor.szName);
+	
 		sprintf(szT, "select * from t_visitor where visitor_name = \'%s\' and visitor_id = \'%s\' and visitor_status>1 and visitor_lefttime <= 0",\
 			visitor.szName, visitor.szID);
 		ret = tAdo.execSelect(szT, &FldCount, outParas);
 		if (ret == ADOERR || (FldCount == 0 && outParas[0].IsEmpty()))
 		{
-			AfxMessageBox(szT);
 			return false;               //该访客未登记
 		}
 		
 		sprintf(szOfficialName, "[%s]  \r\n通过二代证签离",  visitor.szName);	
 		S_2_W(wBuf, szOfficialName, 256);
-		AfxMessageBox(szOfficialName);
 		/*ret = XMessageBox(g_hWindow, wBuf, L"提示", XMB_OK | XMB_CANCEL);
 		if (ret == XMB_CANCEL)
 		{
@@ -3017,7 +3191,6 @@ BOOL CALLBACK OnReadID2Over(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
 	//memset(szT, 0, sizeof(szT));
 	//VisitorTotalTimes(g_stIDCard.name, szT);
 	//::WritePrivateProfileString("TerminalSet", "DataInputPage", "2", CONFIG_FILE);
-	ReOpenUSBCamera();
 	StartKeybd();
 	XWnd_RedrawWnd(g_hWindow);
 	SetVisitorInfo(visitor);
@@ -3028,8 +3201,9 @@ BOOL CALLBACK OnReadID2Over(HWINDOW hWindow, WPARAM wParam, LPARAM lParam)
 
 	//人证比对
 	::DeleteFile(USER_VIDEO_PIC);
-	//XBtn_SetText(g_hTab1, L"拍照比对");
-	::WritePrivateProfileString("Info", "bStopRead", "1", ".\\FaceCompare\\faceCompare.ini");
+	XBtn_SetText(g_hTab1, L"拍照比对");
+	//::WritePrivateProfileString("Info", "bStopRead", "1", ".\\FaceCompare\\faceCompare.ini");
+	g_bStopCompare = false;
 
     if (::GetPrivateProfileInt("TerminalSet", "bMJConnetion",0, CONFIG_FILE)==1) 
 	{
@@ -4776,7 +4950,8 @@ BOOL CALLBACK OnNewVisitor(HELE hEle, HELE hEventEle)
 
 	//g_bAcceptVisite = true;					//缺省为接收访问
     g_bShowCap = true;
-    g_bQRcode = false;
+	g_bQRcode = false;
+    
 	::DeleteFile(USER_HEAD_PIC);            //删除上次头像
 	::DeleteFile(USER_ID_PIC); 
 	::DeleteFile(USER_ID2_PIC);
@@ -5049,8 +5224,9 @@ BOOL CALLBACK OnScanDriverLicense(HELE hEle, HELE hEventEle)
 		return false;
 	}	
 	::DeleteFile(USER_VIDEO_PIC);
-	//XBtn_SetText(g_hTab1, L"拍照比对");
-	::WritePrivateProfileString("Info", "bStopRead", "1", ".\\FaceCompare\\faceCompare.ini");
+	XBtn_SetText(g_hTab1, L"拍照比对");
+	//::WritePrivateProfileString("Info", "bStopRead", "1", ".\\FaceCompare\\faceCompare.ini");
+	g_bStopCompare = false;
 	EnableScanBtns(true);
     XWnd_RedrawWnd(g_hWindow);
 	ShowMainMenu(g_hPage2, true);
@@ -5285,8 +5461,9 @@ BOOL CALLBACK OnScanID2(HELE hEle, HELE hEventEle)
 		return false;
 	}	
 	::DeleteFile(USER_VIDEO_PIC);
-	//XBtn_SetText(g_hTab1, L"拍照比对");
-	::WritePrivateProfileString("Info", "bStopRead", "1", ".\\FaceCompare\\faceCompare.ini");
+	XBtn_SetText(g_hTab1, L"拍照比对");
+	//::WritePrivateProfileString("Info", "bStopRead", "1", ".\\FaceCompare\\faceCompare.ini");
+	g_bStopCompare = false;
 	EnableScanBtns(true);
     XWnd_RedrawWnd(g_hWindow);
 	ShowMainMenu(g_hPage2, true);
@@ -5548,8 +5725,9 @@ BOOL CALLBACK OnScanPassPort(HELE hEle, HELE hEventEle)
 		return false;
 	}
 	::DeleteFile(USER_VIDEO_PIC);
-	//XBtn_SetText(g_hTab1, L"拍照比对");
-	::WritePrivateProfileString("Info", "bStopRead", "1", ".\\FaceCompare\\faceCompare.ini");
+	XBtn_SetText(g_hTab1, L"拍照比对");
+	//::WritePrivateProfileString("Info", "bStopRead", "1", ".\\FaceCompare\\faceCompare.ini");
+	g_bStopCompare = false;
 	EnableScanBtns(true);
 	XWnd_RedrawWnd(g_hWindow);
 	ShowMainMenu(g_hPage2, true);
@@ -5670,8 +5848,7 @@ void EnableScanBtns(BOOL isEnable)
 	 XEle_EnableEle(g_hTab25, isEnable);
 	 XEle_EnableEle(g_hTab26, isEnable);
 	 XEle_EnableEle(g_hTab27, isEnable);
-	 //XEle_EnableEle(g_hTab28, isEnable);
-	 XEle_EnableEle(g_hTab28, true);
+	 XEle_EnableEle(g_hTab28, isEnable);
 }
 //扫描回乡证
 //居留许可证
@@ -5984,9 +6161,15 @@ BOOL CALLBACK OnScanLawyer(HELE hEle, HELE hEventEle)
 	return true;
 }
 
-DWORD WINAPI Thread(void *arg) {
-	// doing something
-	SuspendThread(g_HWDThreadID2ID);
+//扫描其他证件
+BOOL CALLBACK OnScanOther(HELE hEle, HELE hEventEle)
+{
+	if (hEle != hEventEle) 
+	{
+		return false;
+	}
+
+    SuspendThread(g_HWDThreadID2ID);
 	EnableScanBtns(false);
 	//XWnd_RedrawWnd(g_hWindow,TRUE);
 	HELE hPic = XWnd_GetEle(g_hWindow, IDP_PASSPORTPIC);	//初始化设置护照图片显示为空白
@@ -5996,7 +6179,7 @@ DWORD WINAPI Thread(void *arg) {
 
 
 	long ret = 0;
-	char szUserPic[256] = { '\0' }, szIDHeadPic[256] = { '\0' };
+	char szUserPic[256] = {'\0'}, szIDHeadPic[256] = {'\0'};
 	Scan_Para	sP, tP;
 	IDCARD_ALL stIDCard;
 	memset((char *)&stIDCard, 0x0, sizeof(IDCARD_ALL));
@@ -6004,29 +6187,29 @@ DWORD WINAPI Thread(void *arg) {
 	sP.top = 0;
 	sP.right = 300;
 	sP.bottom = 200;
-	sP.scan_mode = SCAN_IR_MODE;
+	sP.scan_mode = SCAN_IR_MODE; 
 	sP.brightness = 0;
 	sP.contrast = 0;
 	sP.resolution = SCAN_200_DPI;
 	sP.gamma = 10;
 	sP.highlight = 0;
 	sP.qualityscan = 1;
-	sP.inversion = 0;
+	sP.inversion   = 0;
 	g_nID2ReadType = ID2_NO;
 	g_nIDType = ID_TYPE_OTHER;
 	EmptyVisitorPara();
-	XWnd_RedrawWnd(g_hWindow, TRUE);
+	XWnd_RedrawWnd(g_hWindow,TRUE);
 
 	strcpy(szUserPic, USER_ID2_PIC);
-	//	ret = ScanImageEx(szUserPic, 10);
-	strcpy(szIDHeadPic, USER_ID_PIC);
-	sP.scan_mode = SCAN_GRAY_MODE;
+//	ret = ScanImageEx(szUserPic, 10);
+	strcpy(szIDHeadPic,   USER_ID_PIC);
+	sP.scan_mode = SCAN_GRAY_MODE; 
 	memcpy(&tP, &sP, sizeof(Scan_Para));
-	tP.scan_mode = SCAN_COLOR_MODE;
-	if (::GetPrivateProfileInt("TerminalSet", "FS533", 0, CONFIG_FILE) == 1)
+	tP.scan_mode = SCAN_COLOR_MODE; 
+	if (::GetPrivateProfileInt("TerminalSet", "FS533",0, CONFIG_FILE)==1) 
 	{
 		ret = CallFS533Bin("ScanImageEx");
-		if (ret == 1)
+		if(ret == 1)
 		{
 			//::GetPrivateProfileString("Scan", "Name", "", stIDCard.name, sizeof(stIDCard.name), FS533Scan_FILE);
 			//::GetPrivateProfileString("Scan", "Number", "", stIDCard.number, sizeof(stIDCard.number), FS533Scan_FILE);
@@ -6042,33 +6225,33 @@ DWORD WINAPI Thread(void *arg) {
 	}
 	else
 		ret = ScanAndRcgCard(szUserPic, "", szIDHeadPic, stIDCard, sP, tP, SCAN_UNKNOW, 1, 1, 1, 15);
-	if (ret == 0 || ret == 48)
+	if (ret == 0 || ret==48)
 	{
-		SetVisitorReadOnly(false);
-		XEdit_SetReadOnly(XWnd_GetEle(g_hWindow, 5023), false);
-		InitVisitorData();
+	    SetVisitorReadOnly(false);
+	    XEdit_SetReadOnly(XWnd_GetEle(g_hWindow, 5023),false);
+	    InitVisitorData();
 		XEdit_SetText(XWnd_GetEle(g_hWindow, IDC_VISITORIDTYPE), L"其他证件");
 		//SetVisitorInfo(stIDCard);	
-		wchar_t wBuf[256] = { 0 };
+		wchar_t wBuf[256] = {0};
 		//MultiByteToWideChar(CP_ACP, 0, szUserPic, -1, wBuf, nLen);
-		S_2_W(wBuf, szUserPic, 256);
+        S_2_W(wBuf, szUserPic, 256);
 		HIMAGE hImg = XImage_LoadFile(wBuf, true);
 		HELE hPic = XWnd_GetEle(g_hWindow, IDP_PASSPORTPIC);
 		XPic_SetImage(hPic, hImg);
 
 		//wchar_t wBuf[256] = {0};
-		S_2_W(wBuf, szIDHeadPic, 256);
-		hImg = XImage_LoadFile(wBuf, true);
-		hPic = XWnd_GetEle(g_hWindow, IDP_HEADPIC);
-		XPic_SetImage(hPic, hImg);
+	    S_2_W(wBuf, szIDHeadPic, 256);
+	    hImg = XImage_LoadFile(wBuf, true);
+	    hPic = XWnd_GetEle(g_hWindow, IDP_HEADPIC);
+	    XPic_SetImage(hPic, hImg);
 		SetVisitorReadOnly(false);
-		//::WritePrivateProfileString("TerminalSet", "DataInputPage", "2", CONFIG_FILE);
+		::WritePrivateProfileString("TerminalSet", "DataInputPage", "2", CONFIG_FILE);
 		//StartKeybd();
 	}
 	else
 	{
 		EnableScanBtns(true);
-		XMessageBox(g_hWindow, L"扫描失败", L"提示");
+		XMessageBox(g_hWindow,L"扫描失败",L"提示");
 		ResumeThread(g_HWDThreadID2ID);
 		XWnd_RedrawWnd(g_hWindow);
 		return false;
@@ -6077,22 +6260,6 @@ DWORD WINAPI Thread(void *arg) {
 	XWnd_RedrawWnd(g_hWindow);
 	ShowMainMenu(g_hPage2, true);
 	ResumeThread(g_HWDThreadID2ID);
-	return 0;
-}
-
-
-//扫描其他证件
-BOOL CALLBACK OnScanOther(HELE hEle, HELE hEventEle)
-{
-	if (hEle != hEventEle) 
-	{
-		return false;
-	}
-
-	CreateThread(NULL, 0, Thread, NULL, 0, NULL);
-
-
-
 	return true;
 }
 
@@ -10917,10 +11084,6 @@ void   CALLBACK   TimerPro(HWND   hwnd,UINT   message,UINT   iTIMERID,DWORD   dw
 				g_bVideoOpened = false;
 				XEle_EnableEle(g_hTab1, false);
 
-				HIMAGE hImg = XImage_LoadFile(L".//skin//image//frame3.jpg", true);
-				HELE hEle = XWnd_GetEle(g_hWindow, IDP_CAMERA);
-				XPic_SetImage(hEle, hImg);
-
 			}
 	    }
 	   XWnd_RedrawWnd(g_hWindow);
@@ -11202,8 +11365,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	HideTaskBar(true);
 
 	//AutoCheckCompanyName(char *szCompany)
-
-
+    //识别过期数据
+	g_bExpireData=true;
+	//CreateThread(NULL, 0, GetSQLThread, NULL, 0, NULL); //添加监听数据库进程
+	
 	HXMLRES  hRes = XXmlRes_Load(L"skin\\mainFrame.res");	//加载资源
 	if (NULL == hRes)
 	{
@@ -11239,7 +11404,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		if(!StartPrintTipsPB())
 			XMessageBox(g_hWindow, L"无法启动PB打印屏条程序，请检查程序安装问题！", L"错误");
 	}
-
 
 	if(1 ==::GetPrivateProfileInt("TerminalSet", "bUptoServer",0, CONFIG_FILE))
 	{
@@ -11746,9 +11910,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	}
 
 	//人脸
-	::WritePrivateProfileString("Info", "bStopRead", "0", ".\\FaceCompare\\faceCompare.ini");
+	//::WritePrivateProfileString("Info", "bStopRead", "0", ".\\FaceCompare\\faceCompare.ini");
+	g_bStopCompare = true;
 	StartFaceScaner();
-	StartFaceCompare();
+	//StartFaceCompare();
 
 
     InitWJUsb(0, GETHWND);
@@ -11789,7 +11954,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
     SetTimer(XWnd_GetHWnd(g_hWindow),TimerHandOn,4000,TimerPro); 
 	SetTimer(XWnd_GetHWnd(g_hWindow),TimerReFresh,1000,TimerPro);
-	SetTimer(XWnd_GetHWnd(g_hWindow),TimerCapture, 1000, TimerPro);
+	//SetTimer(XWnd_GetHWnd(g_hWindow),TimerCapture, 1000, TimerPro); //摄像头保护
 	g_HWDThreadID2ID = CreateThread(NULL, 0, ReadID2Thread2, NULL, 0, NULL);		    //二代证阅读常驻线程
 	/*int iPort = GetPrivateProfileInt("TerminalSet", "ID2Port",1001, CONFIG_FILE);  //二代证端口号
     if(!OpenID2Reader(1001,(long)XWnd_GetHWnd(g_hWindow)))
@@ -11806,6 +11971,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 
 	CreateThread(NULL, 0, GetDataThread, NULL, 0, NULL);		//为键盘程序获取数据的常驻线程
+	if(::GetPrivateProfileInt("TerminalSet", "bFaceCompare",0, CONFIG_FILE)==1)
+		CreateThread(NULL, 0, FaceCompareThread, NULL, 0, NULL); 
 
 	StartKeybd();
 	HideSoftKeybd();
@@ -12493,7 +12660,7 @@ void SetOfficialInfo(const OFFICIALINFO &official)
 void ListTodayVistorsInfo()
 {
 	char szT[512] = {'\0'};
-	long FldCount = 0, ret = 0;;
+	long FldCount = 0, ret = 0;
 	CString outParas[FLD_MAX], outP1[FLD_MAX];
 	CWinAdo tAdo(sCONNSTR_MYSQL);
 	CWinAdo tAdo1(sCONNSTR_MYSQL);
@@ -13811,7 +13978,7 @@ BOOL SaveOfficialInfo(OFFICIALINFO &official)
 }
 
 //访客签离
-BOOL VisitorLogOut(char *pszBarCode)
+BOOL VisitorLogOut(char *pszBarCode2)
 {
 	char szT[4096] = {'\0'}, szVisitorName[32] = {'\0'};
 	long FldCount = 0, ret = 0,lefttime;
@@ -13830,6 +13997,9 @@ BOOL VisitorLogOut(char *pszBarCode)
 		outParas[i].Empty();
 		outParasGo[i].Empty();
 	}
+
+	char pszBarCode[4096] = {'\0'};
+	::GetPrivateProfileString("Bar", "BarNumber", "",pszBarCode,sizeof(pszBarCode), CONFIG_FILE);
 	
 	char szTime[40] = {'\0'};
 	time((time_t *)&lefttime);
@@ -13895,7 +14065,7 @@ BOOL VisitorLogOut(char *pszBarCode)
 void VisitorTotalInfo(char *pszInfo)
 {
 	char szT[4096] = {'\0'};
-	long FldCount = 0, ret = 0;;
+	long FldCount = 0, ret = 0;
 	CString outParas[FLD_MAX];	
 	CWinAdo tAdo(sCONNSTR_MYSQL);
 	
@@ -14096,7 +14266,7 @@ DWORD WINAPI ReadBarCodeThread2(LPVOID lpVoid)
 {
 	CBarCode tBarCode;
 	int iBarCom;
-	char szT[10000] = {'\0'},szBarPort[4]={'\0'};
+	char szT[FLD_MAX] = {'\0'},szBarPort[4]={'\0'};
 	BOOL bRet = false;
 
 	::GetPrivateProfileString("BarCode", "Port", "9", szBarPort, sizeof(szBarPort), CONFIG_FILE);
@@ -14116,8 +14286,7 @@ DWORD WINAPI ReadBarCodeThread2(LPVOID lpVoid)
 		{		
 			memset(g_szComBarcode, 0, sizeof(g_szComBarcode));
 			strcpy(g_szComBarcode,szT);
-			//AfxMessageBox(szT);
-			//::WritePrivateProfileString("Bar", "BarNumber", szT, CONFIG_FILE);
+			::WritePrivateProfileString("Bar", "BarNumber", szT, CONFIG_FILE);
 			::PostMessage(XWnd_GetHWnd(g_hWindow), WM_VISITORLOGOUT, NULL, (LPARAM)szT);			
 		}
 		Sleep(1);
@@ -14359,133 +14528,6 @@ BOOL PrintReceipt(const VISITORINFO &visitor)
 }
 */
 
-BOOL getYueJSon(char *js,VISITORINFO &visitor)
-{
-	//char text[] = "{\"timestamp\":\"2013-11-19T08:50:11\",\"value\":1}";
-	cJSON *json , *json_value , *json_timestamp;
-    // 解析数据包
-    json = cJSON_Parse(js);
-    if (!json)
-    {
-        //printf("Error before: [%s]\n",cJSON_GetErrorPtr());
-		return false;
-    }
-    else
-    {
-        // 解析开关值 //访客预约串都是字符值
-		//访客姓名
-        json_value = cJSON_GetObjectItem( json , "vn");		
-		strcpy(visitor.szName,json_value->valuestring);
-		//被访人姓名
-        json_value = cJSON_GetObjectItem( json , "in");
-		try
-		{
-			strcmp(json_value->valuestring , "");
-			strcpy(visitor.szToOfficialName,json_value->valuestring);
-
-		}
-		catch (...)
-		{
-			XMessageBox(g_hWindow, L"来访人名字为空", L"提示");
-		}
-	
-        //被访人手机
-		json_value = cJSON_GetObjectItem( json , "im");
-		try
-		{
-			strcmp(json_value->valuestring , "");
-			strcpy(visitor.szToOfficialPhone,json_value->valuestring);
-
-		}
-		catch (...)
-		{
-			XMessageBox(g_hWindow, L"来访人手机号码为空", L"提示");
-
-		}
-		
-        //访客手机
-		json_value = cJSON_GetObjectItem( json , "vm");
-		try
-		{
-			strcmp(json_value->valuestring , "");
-			strcpy(visitor.szPhone,json_value->valuestring);
-
-		}
-		catch (...)
-		{
-			XMessageBox(g_hWindow, L"被访人手机号码为空", L"提示");
-		}
-
-		//来访时间
-		json_value = cJSON_GetObjectItem( json , "tm");
-		try
-		{
-			strcmp(json_value->valuestring , "");
-			strcpy(g_szQRvisitime,json_value->valuestring);
-		}
-		catch (...)
-		{
-			XMessageBox(g_hWindow, L"无来访时间", L"提示");
-		}		
-		
-        //来访人数
-		json_value = cJSON_GetObjectItem( json , "pn");
-		try
-		{
-			strcmp(json_value->valuestring , "");
-			strcpy(visitor.szTotalPeople,json_value->valuestring);
-		}
-		catch (...)
-		{
-			XMessageBox(g_hWindow, L"来访人数为空", L"提示");
-		}
-
-        //来访事由
-		json_value = cJSON_GetObjectItem( json , "rs");
-		try
-		{
-			strcmp(json_value->valuestring , "");
-			strcpy(visitor.szReason,json_value->valuestring);
-
-		}
-		catch (...)
-		{
-			XMessageBox(g_hWindow, L"来访事由为空", L"提示");
-		}
-		
-		//车牌号码
-		json_value = cJSON_GetObjectItem( json , "lp");
-		try
-		{
-			strcmp(json_value->valuestring , "");
-			strcpy(visitor.szCarNum,json_value->valuestring);
-		}
-		catch (...)
-		{
-			XMessageBox(g_hWindow, L"车牌号码为空", L"提示");
-		}
-
-        /*
-        if( json_value->type == cJSON_Number )
-        {
-            // 从valueint中获得结果
-            printf("value:%d\r\n",json_value->valueint);
-        }
-        // 解析时间戳
-        json_timestamp = cJSON_GetObjectItem( json , "timestamp");
-        if( json_timestamp->type == cJSON_String )
-        {
-            // valuestring中获得结果
-            printf("%s\r\n",json_timestamp->valuestring);
-        }*/
-        // 释放内存空间
-        cJSON_Delete(json);
-	}
-
-	return true;
-}
-
-
 BOOL ExecPro(char * cmdline, BOOL bAsyncFlag, PROCESS_INFORMATION *ppi)
 {
 	STARTUPINFO si;
@@ -14706,8 +14748,6 @@ DWORD WINAPI SendTimeThread(LPVOID lpVoid)
 	//tSock.CloseSock();
 	return 0;
 }
-
-
 
 DWORD WINAPI GetSQLThread(LPVOID lpVoid)
 {
@@ -15411,6 +15451,35 @@ BOOL CreateReceiptTipsPB(const VISITORINFO &visitor)
 		if (g_PrintTipsCfg.ePrintType == PRINT_SIMPLE_TYPE)
 		{
 			::WritePrivateProfileString("Tips", "TipsType", "3", TIPS_FILE);
+		}
+		else if(::GetPrivateProfileInt("TerminalSet", "TipsTypeDH7", 0, CONFIG_FILE)==1)
+		{
+			char szT[512] = {'\0'};
+			long FldCount = 0, ret = 0;
+			CString outParas[FLD_MAX];
+			CWinAdo tAdo(sCONNSTR_MYSQL);
+			
+			ret = tAdo.OpenAdo();
+			if (ret != ADOOK)
+			{
+				return false;
+			}
+
+			for (int i = 0; i < FLD_MAX; i++)
+			{
+				outParas[i].Empty();
+			}
+			sprintf(szT, "select count(*) from t_visitor where (TO_DAYS(NOW()) - TO_DAYS(FROM_UNIXTIME(visitor_visitetime))=0) and visitor_status >1");
+			ret = tAdo.execSelect(szT, &FldCount, outParas);
+			if (ret == ADOERR || (FldCount == 0 && outParas[0].IsEmpty()))
+			{
+				//return false;
+				::WritePrivateProfileString("Tips", "no", "", TIPS_FILE);
+			}
+			else
+				::WritePrivateProfileString("Tips", "no", outParas[0], TIPS_FILE);
+
+			::WritePrivateProfileString("Tips", "TipsType", "7", TIPS_FILE);
 		}
 	}
 
@@ -16661,12 +16730,8 @@ BOOL EmptyVisitorPara()
 
 	}
 
-	//::DeleteFile(USER_VIDEO_PIC);
-	//::DeleteFile(USER_ID_PIC);
-	//::DeleteFile(USER_ID2_PIC);
-	//::DeleteFile(USER_HEAD_PIC);
-	//::DeleteFile(USER_ID2_TMP);
-	::WritePrivateProfileString("Info", "bStopRead", "0", ".\\FaceCompare\\faceCompare.ini");
+	//::WritePrivateProfileString("Info", "bStopRead", "0", ".\\FaceCompare\\faceCompare.ini");
+	g_bStopCompare = true;
 	memset((char *)&g_Printvisitor, 0, sizeof(VISITORINFO));
 	g_bFaceCompare = true;
 	return true;
@@ -21860,24 +21925,10 @@ void InitVisitorData()
 		XList_SetItemCheck(hList,i,false);
 	}
 	
- 	if(g_bQRcode) //判断清空数据
+	for (i = 5003; i <= 5012; i++)		//清空数据
 	{
-		for(i = 5003; i < 5012; i++)
-		{
-			if((i != 5005) && (i != 5009))
-			{
-				hE = GETELE(i);
-				XEdit_SetText(hE, L"");
-			}	
-		}
-	}
-	else
-	{
-		for (i = 5003; i <= 5012; i++)
-		{
-			hE = GETELE(i);
-			XEdit_SetText(hE, L"");
-		}
+		hE = GETELE(i);
+		XEdit_SetText(hE, L"");
 	}
 	for (i = 5020; i <= 5023; i++)		//清空数据
 	{
@@ -21889,7 +21940,6 @@ void InitVisitorData()
 
 	ShowWindow(g_hCapWnd, true);
 	RePlayCapture();//RePlay();
-	ReOpenUSBCamera();
 	ResumeThread(g_HWDThreadID2ID);
 	return;
 }
@@ -21954,7 +22004,6 @@ void InitData()
 
 	ShowWindow(g_hCapWnd, true);
 	RePlayCapture();//RePlay();
-	ReOpenUSBCamera();
 	ResumeThread(g_HWDThreadID2ID);
     
 
